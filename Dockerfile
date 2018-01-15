@@ -19,6 +19,14 @@ ENV DEBIAN_FRONTEND=noninteractive \
 RUN apt-get update &&\
 apt-get install -y wget
 
+RUN apt-get install --no-install-recommends -y \
+wget procps nginx python python-pip net-tools nginx 
+
+RUN apt-get install -y python-pip
+RUN pip install --upgrade pip
+RUN pip install -U setuptools
+RUN pip install bioblend galaxy-ie-helpers
+
 RUN apt-get install -y zip
 
 RUN apt-get install -y software-properties-common
@@ -30,9 +38,10 @@ RUN \
 
 RUN wget -c http://sourceforge.net/projects/geoserver/files/GeoServer/2.12.1/geoserver-2.12.1-bin.zip
 RUN unzip /geoserver-2.12.1-bin.zip
-RUN echo "export GEOSERVER_HOME=/geoserver-2.12.1" >> ~/.profile
-RUN . ~/.profile
 
+ENV GEOSERVER_HOME /geoserver-2.12.1
+#RUN echo "export GEOSERVER_HOME=/geoserver-2.12.1" >> ~/.profile
+#RUN ["/bin/bash","-c","source ~/.profile"]
 
 
 
@@ -41,11 +50,20 @@ RUN . ~/.profile
 ADD ./startup.sh /startup.sh
 ADD ./monitor_traffic.sh /monitor_traffic.sh
 
+ADD ./get_notebook.py /get_notebook.py
 
 # Nginx configuration
 COPY ./proxy.conf /proxy.conf
 VOLUME ["/import"]
 WORKDIR /import/
+
+RUN apt-get install -y curl
+
+
+RUN rm -rf /var/lib/apt/lists/* && \
+    rm -rf /var/cache/oracle-jdk8-installer
+
+
 
 EXPOSE 80
 CMD /startup.sh

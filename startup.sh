@@ -8,6 +8,7 @@ cp /proxy.conf /etc/nginx/sites-enabled/default;
 
 
 #load dataset into openrefine
+python /get_notebook.py
 
 files=(/import/*)
 until [[ -f "$files" ]]
@@ -17,7 +18,7 @@ do
 done
 
 
-sh $GEOSERVER_HOME/startup.sh &
+sh /geoserver-2.12.1/bin/startup.sh &
 
 
 
